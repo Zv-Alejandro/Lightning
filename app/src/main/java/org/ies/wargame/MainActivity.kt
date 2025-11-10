@@ -16,7 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AccountCircle
+import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -99,7 +99,7 @@ fun Login() {
                 },
                 leadingIcon = {
                     Icon(
-                        Icons.Rounded.AccountCircle,
+                        Icons.Rounded.Email,
                         contentDescription = ""
                     )
                 },
@@ -126,7 +126,8 @@ fun Login() {
                 },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
-//                    No funciona el Icon puesto que espera que le introduzca un ImageVector y para eso tengo que agregar una dependencia (para referenciar el icono que quiero usar) pero no se como hacer sin romper el proyecto
+//                    It doesn't work properly because i am using a drawable
+//                    TODO ask the teacher how add dependencies without breaking the project
 //                    IconToggleButton(
 //                        checked = passwordVisible,
 //                        onCheckedChange = { passwordVisible = it }
