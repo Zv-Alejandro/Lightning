@@ -16,20 +16,21 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import org.ies.wargame.presentation.navigation.Screen
 import org.ies.wargame.presentation.viewmodel.ActivitiesViewModel
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivitiesScreen(
     navController: NavController,
     viewModel: ActivitiesViewModel = viewModel()
 ) {
-    val state = viewModel.uiState.collectAsState().value
+    val activities = viewModel.activities.collectAsState().value
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Actividades escolares") },
                 actions = {
-                    IconButton(onClick = { /* menú navegación si hace falta */ }) {
+                    IconButton(onClick = { }) {
                         Icon(Icons.Default.MoreVert, contentDescription = "Menú")
                     }
                 }
@@ -49,7 +50,7 @@ fun ActivitiesScreen(
                 .padding(innerPadding)
                 .padding(8.dp)
         ) {
-            items(state.activities) { activity ->
+            items(activities) { activity ->
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -58,14 +59,14 @@ fun ActivitiesScreen(
                 ) {
                     Column(modifier = Modifier.padding(12.dp)) {
                         Text(text = activity.title, style = MaterialTheme.typography.titleMedium)
+
                         AnimatedVisibility(visible = activity.expanded) {
                             Column(modifier = Modifier.padding(top = 8.dp)) {
                                 Text(text = activity.description)
                                 Spacer(modifier = Modifier.height(8.dp))
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    Button(onClick = { /* modificar (mínimo requerido: botón visible) */ }) {
+
+                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    Button(onClick = { /* modificar */ }) {
                                         Text("Modificar")
                                     }
                                     OutlinedButton(onClick = { viewModel.deleteActivity(activity.id) }) {

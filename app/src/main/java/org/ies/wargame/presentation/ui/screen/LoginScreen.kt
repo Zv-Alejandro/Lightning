@@ -33,7 +33,12 @@ fun LoginScreen(
     navController: NavController,
     viewModel: LoginViewModel = viewModel()
 ) {
-    val state = viewModel.uiState.collectAsState().value
+    val email = viewModel.email.collectAsState().value
+    val password = viewModel.password.collectAsState().value
+    val passwordVisible = viewModel.passwordVisible.collectAsState().value
+    val emailError = viewModel.emailError.collectAsState().value
+    val passwordError = viewModel.passwordError.collectAsState().value
+    val loginSuccess = viewModel.loginSuccess.collectAsState().value
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
@@ -56,12 +61,12 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             TextField(
-                value = state.email,
+                value = email,
                 onValueChange = viewModel::setEmail,
                 label = {
                     Text(
-                        state.emailError.ifEmpty { "Email" },
-                        color = if (state.emailError.isNotEmpty()) Red else Unspecified
+                        emailError.ifEmpty { "Email" },
+                        color = if (emailError.isNotEmpty()) Red else Unspecified
                     )
                 },
                 leadingIcon = { Icon(Icons.Rounded.Email, "") },
@@ -76,18 +81,18 @@ fun LoginScreen(
             )
 
             TextField(
-                value = state.password,
+                value = password,
                 onValueChange = viewModel::setPassword,
                 label = {
                     Text(
-                        state.passwordError.ifEmpty { "Password" },
-                        color = if (state.passwordError.isNotEmpty()) Red else Unspecified
+                        passwordError.ifEmpty { "Password" },
+                        color = if (passwordError.isNotEmpty()) Red else Unspecified
                     )
                 },
                 leadingIcon = { Icon(Icons.Rounded.Lock, "") },
-                visualTransformation = if (state.passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
-                    val image = if (state.passwordVisible)
+                    val image = if (passwordVisible)
                         painterResource(id = R.drawable.visibility_72dp)
                     else painterResource(id = R.drawable.visibility_off_72dp)
 
@@ -110,13 +115,18 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = { viewModel.login() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 90.dp)
+                onClick = {
+                    viewModel.login()
+                    if (loginSuccess) {
+                        navController.navigate(Screen.Activities.route) {
+                            popUpTo(Screen.Login.route) { inclusive = true }
+                        }
+                    }
+                }
             ) {
                 Text("Login")
             }
+
 
             Spacer(modifier = Modifier.height(16.dp))
 

@@ -34,7 +34,22 @@ fun RegisterScreen(
     navController: NavController,
     viewModel: RegisterViewModel = viewModel()
 ) {
-    val state = viewModel.uiState.collectAsState().value
+    val email = viewModel.email.collectAsState().value
+    val name = viewModel.name.collectAsState().value
+    val password = viewModel.password.collectAsState().value
+    val passwordVisible = viewModel.passwordVisible.collectAsState().value
+
+    val emailError = viewModel.emailError.collectAsState().value
+    val nameError = viewModel.nameError.collectAsState().value
+    val passwordError = viewModel.passwordError.collectAsState().value
+
+    val registerSuccess = viewModel.registerSuccess.collectAsState().value
+
+    if (registerSuccess) {
+        navController.navigate(Screen.Login.route) {
+            popUpTo(Screen.Register.route) { inclusive = true }
+        }
+    }
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
@@ -56,13 +71,14 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // EMAIL
             TextField(
-                value = state.email,
+                value = email,
                 onValueChange = viewModel::setEmail,
                 label = {
                     Text(
-                        state.emailError.ifEmpty { "Email" },
-                        color = if (state.emailError.isNotEmpty()) Red else Unspecified
+                        emailError.ifEmpty { "Email" },
+                        color = if (emailError.isNotEmpty()) Red else Unspecified
                     )
                 },
                 leadingIcon = { Icon(Icons.Rounded.Email, null) },
@@ -76,13 +92,14 @@ fun RegisterScreen(
                 )
             )
 
+            // NAME
             TextField(
-                value = state.name,
+                value = name,
                 onValueChange = viewModel::setName,
                 label = {
                     Text(
-                        state.nameError.ifEmpty { "Name" },
-                        color = if (state.nameError.isNotEmpty()) Red else Unspecified
+                        nameError.ifEmpty { "Nombre" },
+                        color = if (nameError.isNotEmpty()) Red else Unspecified
                     )
                 },
                 leadingIcon = { Icon(Icons.Rounded.AccountCircle, null) },
@@ -96,19 +113,20 @@ fun RegisterScreen(
                 )
             )
 
+            // PASSWORD
             TextField(
-                value = state.password,
+                value = password,
                 onValueChange = viewModel::setPassword,
                 label = {
                     Text(
-                        state.passwordError.ifEmpty { "Password" },
-                        color = if (state.passwordError.isNotEmpty()) Red else Unspecified
+                        passwordError.ifEmpty { "Contraseña" },
+                        color = if (passwordError.isNotEmpty()) Red else Unspecified
                     )
                 },
                 leadingIcon = { Icon(Icons.Rounded.Lock, null) },
-                visualTransformation = if (state.passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
-                    val image = if (state.passwordVisible)
+                    val image = if (passwordVisible)
                         painterResource(id = R.drawable.visibility_72dp)
                     else painterResource(id = R.drawable.visibility_off_72dp)
 

@@ -10,9 +10,8 @@ import androidx.compose.ui.graphics.Color.Companion.Unspecified
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import org.ies.wargame.presentation.viewmodel.AddActivityViewModel
 import org.ies.wargame.presentation.viewmodel.ActivitiesViewModel
-import org.ies.wargame.ui.viewmodel.AddActivityViewModel
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -21,13 +20,14 @@ fun AddActivityScreen(
     viewModel: AddActivityViewModel = viewModel(),
     activitiesViewModel: ActivitiesViewModel = viewModel()
 ) {
-    val state = viewModel.uiState.collectAsState().value
+    val title = viewModel.title.collectAsState().value
+    val description = viewModel.description.collectAsState().value
+    val titleError = viewModel.titleError.collectAsState().value
+    val descriptionError = viewModel.descriptionError.collectAsState().value
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Añadir actividad") }
-            )
+            TopAppBar(title = { Text("Añadir actividad") })
         }
     ) { innerPadding ->
         Column(
@@ -36,13 +36,14 @@ fun AddActivityScreen(
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
+
             OutlinedTextField(
-                value = state.title,
+                value = title,
                 onValueChange = viewModel::setTitle,
                 label = {
                     Text(
-                        state.titleError.ifEmpty { "Título" },
-                        color = if (state.titleError.isNotEmpty()) Red else Unspecified
+                        titleError.ifEmpty { "Título" },
+                        color = if (titleError.isNotEmpty()) Red else Unspecified
                     )
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -51,12 +52,12 @@ fun AddActivityScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
-                value = state.description,
+                value = description,
                 onValueChange = viewModel::setDescription,
                 label = {
                     Text(
-                        state.descriptionError.ifEmpty { "Descripción" },
-                        color = if (state.descriptionError.isNotEmpty()) Red else Unspecified
+                        descriptionError.ifEmpty { "Descripción" },
+                        color = if (descriptionError.isNotEmpty()) Red else Unspecified
                     )
                 },
                 modifier = Modifier
@@ -69,10 +70,7 @@ fun AddActivityScreen(
             Button(
                 onClick = {
                     if (viewModel.validate()) {
-                        activitiesViewModel.addActivity(
-                            title = state.title,
-                            description = state.description
-                        )
+                        activitiesViewModel.addActivity(title, description)
                         viewModel.clear()
                         navController.popBackStack()
                     }
