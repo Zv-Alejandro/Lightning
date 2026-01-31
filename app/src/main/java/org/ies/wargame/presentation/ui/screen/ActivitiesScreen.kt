@@ -21,7 +21,7 @@ import org.ies.wargame.presentation.viewmodel.ActivitiesViewModel
 @Composable
 fun ActivitiesScreen(
     navController: NavController,
-    viewModel: ActivitiesViewModel = viewModel()
+    viewModel: ActivitiesViewModel
 ) {
     val activities = viewModel.activities.collectAsState().value
 

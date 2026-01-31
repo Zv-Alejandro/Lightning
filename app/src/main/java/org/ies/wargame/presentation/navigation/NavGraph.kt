@@ -1,18 +1,18 @@
 package org.ies.wargame.presentation.navigation
 
-
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import org.ies.wargame.presentation.ui.screen.LoginScreen
-import org.ies.wargame.presentation.ui.screen.RegisterScreen
-import org.ies.wargame.presentation.ui.screen.ActivitiesScreen
-import org.ies.wargame.presentation.ui.screen.AddActivityScreen
+import org.ies.wargame.presentation.ui.screen.*
+import org.ies.wargame.presentation.viewmodel.ActivitiesViewModel
+import org.ies.wargame.presentation.viewmodel.AddActivityViewModel
 
 @Composable
 fun NavGraph(startDestination: String = Screen.Login.route) {
     val navController = rememberNavController()
+    val activitiesViewModel: ActivitiesViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -25,10 +25,12 @@ fun NavGraph(startDestination: String = Screen.Login.route) {
             RegisterScreen(navController)
         }
         composable(Screen.Activities.route) {
-            ActivitiesScreen(navController)
+            ActivitiesScreen(navController, activitiesViewModel)
         }
         composable(Screen.AddActivity.route) {
-            AddActivityScreen(navController)
+            AddActivityScreen(navController, activitiesViewModel)
         }
     }
 }
+
+
