@@ -32,10 +32,16 @@ class ActivitiesViewModel : ViewModel() {
 
     fun addActivity(title: String, description: String) {
         val nextId = (_activities.value.maxOfOrNull { it.id } ?: 0) + 1
-        _activities.value = _activities.value + ActivityItem(
-            id = nextId,
-            title = title,
-            description = description
-        )
+        _activities.value += ActivityItem(
+                    id = nextId,
+                    title = title,
+                    description = description
+                )
+    }
+    fun updateActivity(id: Int, title: String, description: String) {
+        _activities.value = _activities.value.map {
+            if (it.id == id) it.copy(title = title, description = description)
+            else it
+        }
     }
 }

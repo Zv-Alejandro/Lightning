@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import org.ies.wargame.presentation.navigation.Screen
 import org.ies.wargame.presentation.viewmodel.ActivitiesViewModel
@@ -66,7 +65,9 @@ fun ActivitiesScreen(
                                 Spacer(modifier = Modifier.height(8.dp))
 
                                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                    Button(onClick = { /* modificar */ }) {
+                                    Button(onClick = {
+                                        navController.navigate(Screen.EditActivity.routeWithId(activity.id))
+                                    }) {
                                         Text("Modificar")
                                     }
                                     OutlinedButton(onClick = { viewModel.deleteActivity(activity.id) }) {
