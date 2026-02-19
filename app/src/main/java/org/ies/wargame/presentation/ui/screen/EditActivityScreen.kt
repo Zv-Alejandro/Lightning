@@ -6,9 +6,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.graphics.Color.Companion.Unspecified
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import org.ies.wargame.presentation.ui.components.MenuDeAcciones
 import org.ies.wargame.presentation.viewmodel.EditActivityViewModel
 import org.ies.wargame.presentation.viewmodel.ActivitiesViewModel
 
@@ -32,13 +35,13 @@ fun EditActivityScreen(
     val descriptionError = viewModel.descriptionError.collectAsState().value
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Editar actividad") }) }
+        topBar = { MenuDeAcciones(navController, "Editar actividad") }
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(16.dp)
+                .padding(horizontal = 16.dp)
         ) {
 
             OutlinedTextField(
@@ -84,4 +87,13 @@ fun EditActivityScreen(
             }
         }
     }
+}
+@Composable
+@Preview(showBackground = true)
+fun EditionPreview(){
+    EditActivityScreen(
+        navController = rememberNavController(),
+        activitiesViewModel = viewModel(),
+        id = 1
+    )
 }

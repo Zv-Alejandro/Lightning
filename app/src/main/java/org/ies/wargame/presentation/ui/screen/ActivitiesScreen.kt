@@ -10,10 +10,19 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import org.ies.wargame.domain.model.ActivityItem
 import org.ies.wargame.presentation.navigation.Screen
+import org.ies.wargame.presentation.ui.components.MenuDeAcciones
 import org.ies.wargame.presentation.viewmodel.ActivitiesViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -23,17 +32,27 @@ fun ActivitiesScreen(
     viewModel: ActivitiesViewModel
 ) {
     val activities = viewModel.activities.collectAsState().value
-
+    var deleteActivity by remember { mutableStateOf<ActivityItem?>(null) }
+    deleteActivity?.let { activityItem ->
+        AlertDialog(
+            onDismissRequest = { deleteActivity = null },
+            title = { Text(text = "Eliminar actividad") },
+            text = { Text("¿Estás seguro de que deseas eliminar la actividad ${activityItem.title}?") },
+            confirmButton = {
+                Button(onClick = { viewModel.deleteActivity(activityItem.id)
+                    deleteActivity = null }) {
+                    Text("Aceptar")
+                }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = {
+                    deleteActivity = null
+                }) { Text("Cancelar") }
+            })
+    }
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Actividades escolares") },
-                actions = {
-                    IconButton(onClick = { }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "Menú")
-                    }
-                }
-            )
+            MenuDeAcciones(navController,"Lista de actividades")
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -53,7 +72,7 @@ fun ActivitiesScreen(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 4.dp)
+                        .padding(vertical = 6.dp)
                         .clickable { viewModel.toggleExpanded(activity.id) }
                 ) {
                     Column(modifier = Modifier.padding(12.dp)) {
@@ -70,7 +89,7 @@ fun ActivitiesScreen(
                                     }) {
                                         Text("Modificar")
                                     }
-                                    OutlinedButton(onClick = { viewModel.deleteActivity(activity.id) }) {
+                                    OutlinedButton(onClick = {deleteActivity = activity}) {
                                         Text("Eliminar")
                                     }
                                 }
@@ -81,4 +100,13 @@ fun ActivitiesScreen(
             }
         }
     }
+}
+
+@Composable
+@Preview(showBackground = true)
+fun previewSt(){
+    ActivitiesScreen(
+        navController = rememberNavController(),
+        viewModel = viewModel()
+    )
 }
