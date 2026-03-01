@@ -9,14 +9,14 @@ Construida bajo los principios de **Clean Architecture** y las últimas tendenci
 
 ---
 
-## :mobile_phone: Capturas de Pantalla
+## Capturas de Pantalla
 
 | Login | Registro |
 |-------|----------|
-| ![Login](screenshots/login) | ![Register](screenshots/register) |
+| ![Login](login) | ![Register](register) |
 ---
 
-## :sparkles: Características
+## ❇️: Características
 
 - **Autenticación:**  
   Sistema de Login y Registro seguro mediante Firebase Auth.
@@ -35,7 +35,7 @@ Construida bajo los principios de **Clean Architecture** y las últimas tendenci
 
 ---
 
-## :tools: Stack Tecnológico
+## 🧰: Stack Tecnológico
 
 - **Lenguaje:** Kotlin + Corrutinas & Flow.  
 - **UI:** Jetpack Compose (Material 3).  
@@ -46,7 +46,7 @@ Construida bajo los principios de **Clean Architecture** y las últimas tendenci
 
 ---
 
-## :construction_site: Estructura del Proyecto
+## 🏗️: Estructura del Proyecto
 
 ```text
 app/
