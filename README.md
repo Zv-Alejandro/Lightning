@@ -73,15 +73,5 @@ git clone https://github.com/tu-usuario/wargame-app.git
 ---
 
 Creado por **Alejandro Zagastizabal**  
-Estudiante de Informática.
+Estudiante de FP DAM.
 
----
-
-### 💡 Consejos extra para tu GitHub
-
-1. **Sustituye las capturas:**  
-   Cambia los links de `placeholder.com` por capturas reales de tu app. Puedes subirlas a una carpeta llamada `screenshots` en el mismo repo.
-
-2. **Añade una Licencia:**  
-   En GitHub, dale a *"Add file"* → *"Create new file"* y escribe `LICENSE`.  
-   Elige la **MIT License**, es la estándar para proyectos de estudiantes.
