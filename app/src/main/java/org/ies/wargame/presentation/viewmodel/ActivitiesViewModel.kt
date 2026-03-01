@@ -1,47 +1,58 @@
 package org.ies.wargame.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import org.ies.wargame.domain.model.ActivityItem
+import org.ies.wargame.domain.usecase.AddActivityUseCase
+import org.ies.wargame.domain.usecase.DeleteActivityUseCase
+import org.ies.wargame.domain.usecase.ListActivitiesUseCase
+import org.ies.wargame.domain.usecase.UpdateActivityUseCase
 
-class ActivitiesViewModel : ViewModel() {
+class ActivitiesViewModel(
+    private val listActivitiesUseCase: ListActivitiesUseCase,
+    private val deleteActivityUseCase: DeleteActivityUseCase,
+    private val addActivityUseCase: AddActivityUseCase,
+    private val updateActivityUseCase: UpdateActivityUseCase
 
-    private val _activities = MutableStateFlow(
-        listOf(
-            ActivityItem(1, "Reunión padres", "Reunión informativa sobre el inicio de curso"),
-            ActivityItem(
-                2,
-                "Entrega de notas",
-                "Publicación de calificaciones del primer trimestre"
-            ),
-            ActivityItem(3, "Excursión", "Salida cultural al museo de ciencias")
-        )
-    )
-    val activities: StateFlow<List<ActivityItem>> = _activities
+) : ViewModel() {
 
-    fun toggleExpanded(id: Int) {
-        _activities.value = _activities.value.map {
-            if (it.id == id) it.copy(expanded = !it.expanded) else it
+    private val expandedIds = MutableStateFlow<Set<String>>(emptySet())
+    val activities: StateFlow<List<ActivityItem>> =
+        listActivitiesUseCase().combine(expandedIds) { firebaseList, expandedSet ->
+            firebaseList.map {
+                it.copy(expanded = expandedSet.contains(it.id))
+            }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    fun toggleExpanded(id: String) {
+        expandedIds.update { currentSet -> if (currentSet.contains(id)) currentSet - id else currentSet + id }
+    }
+
+    fun deleteActivity(id: String) {
+        viewModelScope.launch {
+            // Invoca el deleteUserUseCase
+            deleteActivityUseCase(id)
         }
     }
 
-    fun deleteActivity(id: Int) {
-        _activities.value = _activities.value.filterNot { it.id == id }
+    fun addActivity(activityItem: ActivityItem) {
+        viewModelScope.launch {
+            // Invoca el deleteUserUseCase
+            addActivityUseCase(activityItem)
+        }
     }
 
-    fun addActivity(title: String, description: String) {
-        val nextId = (_activities.value.maxOfOrNull { it.id } ?: 0) + 1
-        _activities.value += ActivityItem(
-                    id = nextId,
-                    title = title,
-                    description = description
-                )
-    }
-    fun updateActivity(id: Int, title: String, description: String) {
-        _activities.value = _activities.value.map {
-            if (it.id == id) it.copy(title = title, description = description)
-            else it
+    fun updateActivity(activityItem: ActivityItem) {
+        viewModelScope.launch {
+            // Invoca el deleteUserUseCase
+            updateActivityUseCase(activityItem)
         }
     }
 }

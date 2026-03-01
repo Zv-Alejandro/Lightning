@@ -7,7 +7,7 @@ sealed class Screen(val route: String) {
     data object Activities : Screen("activities")
     data object AddActivity : Screen("add_activity")
     data object EditActivity : Screen("edit_activity/{id}") {
-        fun routeWithId(id: Int) = "edit_activity/$id"
+        fun routeWithId(id: String) = "edit_activity/$id"
     }
 
 }

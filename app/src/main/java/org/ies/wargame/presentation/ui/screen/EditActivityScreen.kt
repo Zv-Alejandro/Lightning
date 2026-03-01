@@ -4,8 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color.Companion.Red
-import androidx.compose.ui.graphics.Color.Companion.Unspecified
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -14,86 +12,75 @@ import androidx.navigation.compose.rememberNavController
 import org.ies.wargame.presentation.ui.components.MenuDeAcciones
 import org.ies.wargame.presentation.viewmodel.EditActivityViewModel
 import org.ies.wargame.presentation.viewmodel.ActivitiesViewModel
+import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditActivityScreen(
     navController: NavController,
-    activitiesViewModel: ActivitiesViewModel,
-    id: Int,
-    viewModel: EditActivityViewModel = viewModel()
+    id: String,
+    activitiesViewModel: ActivitiesViewModel = koinViewModel(),
+    viewModel: EditActivityViewModel = koinViewModel()
 ) {
-    val activity = activitiesViewModel.activities.collectAsState().value.first { it.id == id }
-
-    LaunchedEffect(Unit) {
-        viewModel.load(activity)
+    val activities by activitiesViewModel.activities.collectAsState()
+    val activity = remember(activities) {
+        activities.find { it.id == id }
+    }
+// 3. Cargamos los datos solo cuando la actividad esté lista
+    LaunchedEffect(activity) {
+        activity?.let { viewModel.load(it) }
     }
 
-    val title = viewModel.title.collectAsState().value
-    val description = viewModel.description.collectAsState().value
-    val titleError = viewModel.titleError.collectAsState().value
-    val descriptionError = viewModel.descriptionError.collectAsState().value
-
-    Scaffold(
-        topBar = { MenuDeAcciones(navController, "Editar actividad") }
-    ) { innerPadding ->
+// Observamos los estados (usando delegados 'by' para limpiar el código)
+    val title by viewModel.title.collectAsState()
+    val description by viewModel.description.collectAsState()
+    val titleError by viewModel.titleError.collectAsState()
+    val descriptionError by viewModel.descriptionError.collectAsState()
+    Scaffold(topBar = { MenuDeAcciones(navController, "Editar actividad") }) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp)
         ) {
-
             OutlinedTextField(
                 value = title,
                 onValueChange = viewModel::setTitle,
-                label = {
-                    Text(
-                        titleError.ifEmpty { "Título" },
-                        color = if (titleError.isNotEmpty()) Red else Unspecified
-                    )
-                },
+                isError = !titleError.isNullOrEmpty(),
+                // Indica visualmente el error
+                label = { Text(titleError ?: "Título") },
                 modifier = Modifier.fillMaxWidth()
             )
-
             Spacer(modifier = Modifier.height(12.dp))
-
             OutlinedTextField(
-                value = description,
+                value =
+                    description,
                 onValueChange = viewModel::setDescription,
+                isError = !descriptionError.isNullOrEmpty(),
                 label = {
                     Text(
-                        descriptionError.ifEmpty { "Descripción" },
-                        color = if (descriptionError.isNotEmpty()) Red else Unspecified
+                        descriptionError ?: "Descripción"
                     )
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(120.dp)
             )
-
             Spacer(modifier = Modifier.height(24.dp))
-
-            Button(
-                onClick = {
-                    if (viewModel.validate()) {
-                        activitiesViewModel.updateActivity(id, title, description)
-                        navController.popBackStack()
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
+            Button(onClick = {
+                // 4. Usamos la función de guardado del ViewModel de edición
+                viewModel.saveActivity { navController.popBackStack() }
+            }, modifier = Modifier.fillMaxWidth()) {
                 Text("Guardar cambios")
             }
         }
     }
 }
+
 @Composable
 @Preview(showBackground = true)
-fun EditionPreview(){
+fun EditionPreview() {
     EditActivityScreen(
         navController = rememberNavController(),
-        activitiesViewModel = viewModel(),
-        id = 1
+        "actividad_1"
     )
 }

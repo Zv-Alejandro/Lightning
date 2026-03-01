@@ -11,6 +11,7 @@ import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Red
@@ -28,30 +29,22 @@ import androidx.navigation.NavController
 import org.ies.wargame.R
 import org.ies.wargame.presentation.navigation.Screen
 import org.ies.wargame.presentation.viewmodel.RegisterViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun RegisterScreen(
-    navController: NavController,
-    viewModel: RegisterViewModel = viewModel()
-) {
-    val email = viewModel.email.collectAsState().value
-    val name = viewModel.name.collectAsState().value
-    val password = viewModel.password.collectAsState().value
-    val passwordVisible = viewModel.passwordVisible.collectAsState().value
-
-    val emailError = viewModel.emailError.collectAsState().value
-    val nameError = viewModel.nameError.collectAsState().value
-    val passwordError = viewModel.passwordError.collectAsState().value
-
-    val registerSuccess = viewModel.registerSuccess.collectAsState().value
-
-    if (registerSuccess) {
-        navController.navigate(Screen.Login.route) {
-            popUpTo(Screen.Register.route) { inclusive = true }
-        }
-    }
-
-    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel = koinViewModel()) {
+    val email by viewModel.email.collectAsState()
+    val name by viewModel.name.collectAsState()
+    val password by viewModel.password.collectAsState()
+    val passwordVisible by viewModel.passwordVisible.collectAsState()
+    val emailError by viewModel.emailError.collectAsState()
+    val nameError by viewModel.nameError.collectAsState()
+    val passwordError by viewModel.passwordError.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    Scaffold(
+        modifier =
+            Modifier.fillMaxSize()
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -59,29 +52,29 @@ fun RegisterScreen(
                 .padding(vertical = 100.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-
             Image(
                 painter = painterResource(id = R.drawable.rsm),
                 contentDescription = "logo",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier.size(200.dp),
             )
-
             Text("Register", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
-
             Spacer(modifier = Modifier.height(16.dp))
-
-            // EMAIL
             TextField(
                 value = email,
                 onValueChange = viewModel::setEmail,
+                isError = emailError != null,
                 label = {
                     Text(
-                        emailError.ifEmpty { "Email" },
-                        color = if (emailError.isNotEmpty()) Red else Unspecified
+                        emailError ?: "Email"
                     )
                 },
-                leadingIcon = { Icon(Icons.Rounded.Email, null) },
+                leadingIcon = {
+                    Icon(
+                        Icons.Rounded.Email,
+                        null
+                    )
+                },
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -91,18 +84,23 @@ fun RegisterScreen(
                     unfocusedIndicatorColor = Transparent
                 )
             )
-
-            // NAME
+            Spacer(modifier = Modifier.height(12.dp))
             TextField(
-                value = name,
+                value =
+                    name,
                 onValueChange = viewModel::setName,
+                isError = nameError != null,
                 label = {
                     Text(
-                        nameError.ifEmpty { "Nombre" },
-                        color = if (nameError.isNotEmpty()) Red else Unspecified
+                        nameError ?: "Nombre"
                     )
                 },
-                leadingIcon = { Icon(Icons.Rounded.AccountCircle, null) },
+                leadingIcon = {
+                    Icon(
+                        Icons.Rounded.AccountCircle,
+                        null
+                    )
+                },
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -112,29 +110,34 @@ fun RegisterScreen(
                     unfocusedIndicatorColor = Transparent
                 )
             )
-
-            // PASSWORD
+            Spacer(modifier = Modifier.height(12.dp))
             TextField(
-                value = password,
+                value =
+                    password,
                 onValueChange = viewModel::setPassword,
+                isError = passwordError != null,
                 label = {
                     Text(
-                        passwordError.ifEmpty { "Contraseña" },
-                        color = if (passwordError.isNotEmpty()) Red else Unspecified
+                        passwordError ?: "Contraseña"
                     )
                 },
-                leadingIcon = { Icon(Icons.Rounded.Lock, null) },
+                leadingIcon = {
+                    Icon(
+                        Icons.Rounded.Lock,
+                        null
+                    )
+                },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
-                    val image = if (passwordVisible)
-                        painterResource(id = R.drawable.visibility_72dp)
-                    else painterResource(id = R.drawable.visibility_off_72dp)
-
+                    val image =
+                        if (passwordVisible) painterResource(id = R.drawable.visibility_72dp) else painterResource(
+                            id = R.drawable.visibility_off_72dp
+                        )
                     Icon(
-                        painter = image,
+                        painter =
+                            image,
                         contentDescription = "",
-                        modifier = Modifier.clickable { viewModel.togglePasswordVisibility() }
-                    )
+                        modifier = Modifier.clickable { viewModel.togglePasswordVisibility() })
                 },
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier
@@ -145,27 +148,39 @@ fun RegisterScreen(
                     unfocusedIndicatorColor = Transparent
                 )
             )
-
             Spacer(modifier = Modifier.height(24.dp))
-
             Button(
-                onClick = { viewModel.register() },
+                onClick = {
+                    viewModel.register {
+                        navController.navigate(
+                            Screen.Login.route
+                        ) { popUpTo(Screen.Register.route) { inclusive = true } }
+                    }
+                },
+                enabled = !isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 90.dp)
+                    .padding(horizontal = 20.dp)
             ) {
-                Text("Register")
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                } else {
+                    Text("Register")
+                }
             }
-
             Spacer(modifier = Modifier.height(16.dp))
-
             Text(
-                text = "Already have an account?",
+                text =
+                    "Already have an account?",
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.clickable {
-                    navController.navigate(Screen.Login.route)
-                }
-            )
+                    navController.navigate(
+                        Screen.Login.route
+                    )
+                })
         }
     }
 }

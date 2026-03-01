@@ -24,12 +24,13 @@ import org.ies.wargame.domain.model.ActivityItem
 import org.ies.wargame.presentation.navigation.Screen
 import org.ies.wargame.presentation.ui.components.MenuDeAcciones
 import org.ies.wargame.presentation.viewmodel.ActivitiesViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivitiesScreen(
     navController: NavController,
-    viewModel: ActivitiesViewModel
+    viewModel: ActivitiesViewModel = koinViewModel()
 ) {
     val activities = viewModel.activities.collectAsState().value
     var deleteActivity by remember { mutableStateOf<ActivityItem?>(null) }

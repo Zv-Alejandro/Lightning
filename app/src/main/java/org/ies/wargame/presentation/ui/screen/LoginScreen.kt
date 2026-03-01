@@ -10,11 +10,10 @@ import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.graphics.Color.Companion.Transparent
-import androidx.compose.ui.graphics.Color.Companion.Unspecified
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -22,25 +21,24 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import org.ies.wargame.R
 import org.ies.wargame.presentation.navigation.Screen
 import org.ies.wargame.presentation.viewmodel.LoginViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun LoginScreen(
-    navController: NavController,
-    viewModel: LoginViewModel = viewModel()
-) {
-    val email = viewModel.email.collectAsState().value
-    val password = viewModel.password.collectAsState().value
-    val passwordVisible = viewModel.passwordVisible.collectAsState().value
-    val emailError = viewModel.emailError.collectAsState().value
-    val passwordError = viewModel.passwordError.collectAsState().value
-    val loginSuccess = viewModel.loginSuccess.collectAsState().value
-
-    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+fun LoginScreen(navController: NavController, viewModel: LoginViewModel = koinViewModel()) {
+    val email by viewModel.email.collectAsState()
+    val password by viewModel.password.collectAsState()
+    val passwordVisible by viewModel.passwordVisible.collectAsState()
+    val emailError by viewModel.emailError.collectAsState()
+    val passwordError by viewModel.passwordError.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    Scaffold(
+        modifier =
+            Modifier.fillMaxSize()
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -48,28 +46,29 @@ fun LoginScreen(
                 .padding(vertical = 140.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-
             Image(
                 painter = painterResource(id = R.drawable.rsm),
                 contentDescription = "logo",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier.size(200.dp),
             )
-
             Text("Login", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
-
             Spacer(modifier = Modifier.height(16.dp))
-
             TextField(
                 value = email,
                 onValueChange = viewModel::setEmail,
+                isError = emailError != null,
                 label = {
                     Text(
-                        emailError.ifEmpty { "Email" },
-                        color = if (emailError.isNotEmpty()) Red else Unspecified
+                        emailError ?: "Email"
                     )
                 },
-                leadingIcon = { Icon(Icons.Rounded.Email, "") },
+                leadingIcon = {
+                    Icon(
+                        Icons.Rounded.Email,
+                        ""
+                    )
+                },
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -79,28 +78,34 @@ fun LoginScreen(
                     unfocusedIndicatorColor = Transparent
                 )
             )
-
+            Spacer(modifier = Modifier.height(12.dp))
             TextField(
-                value = password,
+                value =
+                    password,
                 onValueChange = viewModel::setPassword,
+                isError = passwordError != null,
                 label = {
                     Text(
-                        passwordError.ifEmpty { "Password" },
-                        color = if (passwordError.isNotEmpty()) Red else Unspecified
+                        passwordError ?: "Password"
                     )
                 },
-                leadingIcon = { Icon(Icons.Rounded.Lock, "") },
+                leadingIcon = {
+                    Icon(
+                        Icons.Rounded.Lock,
+                        ""
+                    )
+                },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
-                    val image = if (passwordVisible)
-                        painterResource(id = R.drawable.visibility_72dp)
-                    else painterResource(id = R.drawable.visibility_off_72dp)
-
+                    val image =
+                        if (passwordVisible) painterResource(id = R.drawable.visibility_72dp) else painterResource(
+                            id = R.drawable.visibility_off_72dp
+                        )
                     Icon(
-                        painter = image,
-                        contentDescription = "",
-                        modifier = Modifier.clickable { viewModel.togglePasswordVisibility() }
-                    )
+                        painter =
+                            image,
+                        contentDescription = null,
+                        modifier = Modifier.clickable { viewModel.togglePasswordVisibility() })
                 },
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier
@@ -111,36 +116,42 @@ fun LoginScreen(
                     unfocusedIndicatorColor = Transparent
                 )
             )
-
             Spacer(modifier = Modifier.height(24.dp))
-
             Button(
                 onClick = {
-                    viewModel.login()
-                    if (loginSuccess) {
-                        navController.navigate(Screen.Activities.route) {
-                            popUpTo(Screen.Login.route) { inclusive = true }
-                        }
+                    viewModel.login {
+                        navController.navigate(
+                            Screen.Activities.route
+                        ) { popUpTo(Screen.Login.route) { inclusive = true } }
                     }
-                }
+                },
+                enabled = !isLoading,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
             ) {
-                Text("Login")
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                } else {
+                    Text("Login")
+                }
             }
-
-
             Spacer(modifier = Modifier.height(16.dp))
-
             Row {
                 Text("Not a student yet? ")
                 Text(
                     "Enroll now!",
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.clickable {
-                        navController.navigate(Screen.Register.route)
+                        navController.navigate(
+                            Screen.Register.route
+                        )
                     }
                 )
             }
         }
     }
 }
-

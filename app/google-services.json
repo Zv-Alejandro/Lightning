@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "826746045246",
+    "project_id": "lightning-app-c29d5",
+    "storage_bucket": "lightning-app-c29d5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:826746045246:android:e3339901662bbdfa73a26f",
+        "android_client_info": {
+          "package_name": "org.ies.wargame"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAYFXNqNQnkWnjVyNZjjZjeCqdrYCkxbqQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
