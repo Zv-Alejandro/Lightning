@@ -46,18 +46,6 @@ Construida bajo los principios de **Clean Architecture** y las últimas tendenci
 
 ---
 
-## 🏗️: Estructura del Proyecto
-
-```text
-app/
-├── data/          # Implementación de repositorios y fuentes de datos (Firebase)
-├── domain/        # Modelos de negocio y Use Cases (Lógica pura)
-├── presentation/  # UI (Screens, ViewModels, Theme)
-└── di/            # Módulos de Koin
-```
-
----
-
 ## 🚀 Instalación
 
 1. Clona el repositorio:
