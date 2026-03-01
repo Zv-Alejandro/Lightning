@@ -63,7 +63,7 @@ app/
 1. Clona el repositorio:
 
 ```bash
-git clone https://github.com/tu-usuario/wargame-app.git
+git clone https://github.com/Zv-Alejandro/Lightning.git
 ```
 
 2. Añade tu archivo `google-services.json` en la carpeta `app/`.
