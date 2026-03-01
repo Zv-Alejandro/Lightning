@@ -13,7 +13,7 @@ Construida bajo los principios de **Clean Architecture** y las últimas tendenci
 
 | Login | Registro |
 |-------|----------|
-| ![Login](login) | ![Register](register) |
+| ![Login](login.png) | ![Register](register.png) |
 ---
 
 ## ❇️: Características
